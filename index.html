@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大阪徒歩3時間散策 旅のしおり</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #3498db, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .route-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .route-tab {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+        }
+        
+        .route-tab:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .route-tab.active {
+            border-color: #3498db;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+        }
+        
+        .route-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .route-content.active {
+            display: block;
+        }
+        
+        .route-map {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .spot {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 180px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .spot.start {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+        }
+        
+        .spot.end {
+            background: linear-gradient(135deg, #e84393, #fd79a8);
+        }
+        
+        .spot h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .spot .time {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .arrow {
+            font-size: 2rem;
+            color: #3498db;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .detail-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .detail-card h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .detail-card ul {
+            list-style: none;
+        }
+        
+        .detail-card li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .detail-card li:before {
+            content: "📍";
+            position: absolute;
+            left: 0;
+        }
+        
+        .food-item:before {
+            content: "🍽️";
+        }
+        
+        .tip-item:before {
+            content: "💡";
+        }
+        
+        .time-item:before {
+            content: "⏰";
+        }
+        
+        .maps-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .maps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .map-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        .map-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .map-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .map-card p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+        
+        .map-btn {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .map-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            transform: scale(1.05);
+            text-decoration: none;
+            color: white;
+        }
+        
+        .map-instructions {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .map-instructions h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .map-instructions ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .map-instructions li {
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .map-instructions li:before {
+            position: absolute;
+            left: 0;
+            top: 8px;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .summary h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e74c3c;
+            display: block;
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .route-selector, .print-btn {
+                display: none;
+            }
+            .route-content {
+                display: block !important;
+                page-break-after: always;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .route-map {
+                flex-direction: column;
+            }
+            .arrow {
+                transform: rotate(90deg);
+            }
+            .stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            .maps-grid {
+                grid-template-columns: 1fr;
+            }
+            .map-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚶‍♂️ 大阪徒歩3時間散策ガイド 🚶‍♀️</h1>
+            <p>堺筋本町駅 → 近鉄布施駅まで約10-12km の3つの魅力的なルート</p>
+        </div>
+        
+        <div class="route-selector">
+            <div class="route-tab active" onclick="showRoute(1)">
+                <h3>🛍️ パターン1</h3>
+                <p><strong>商業・歴史・多文化ルート</strong></p>
+                <p>ショッピング + 大阪城 + コリアタウン</p>
+            </div>
+            <div class="route-tab" onclick="showRoute(2)">
+                <h3>⛩️ パターン2</h3>
+                <p><strong>寺社仏閣・下町文化ルート</strong></p>
+                <p>四天王寺 + 新世界 + 通天閣</p>
+            </div>
+            <div class="route-tab" onclick="showRoute(3)">
+                <h3>🌊 パターン3</h3>
+                <p><strong>水辺・文化・ビジネス街ルート</strong></p>
+                <p>中之島 + 大川沿い + レトロ建築</p>
+            </div>
+        </div>
+        
+        <!-- パターン1 -->
+        <div class="route-content active" id="route1">
+            <h2>🛍️ パターン1：商業・歴史・多文化ルート</h2>
+            
+            <div class="route-map">
+                <div class="spot start">
+                    <h3>堺筋本町駅</h3>
+                    <div class="time">スタート地点</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>船場センタービル</h3>
+                    <div class="time">30分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>大阪城公園</h3>
+                    <div class="time">45分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>鶴橋・生野コリアタウン</h3>
+                    <div class="time">60分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot end">
+                    <h3>近鉄布施駅</h3>
+                    <div class="time">ゴール</div>
+                </div>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-card">
+                    <h4>🏛️ 主要スポット</h4>
+                    <ul>
+                        <li>船場センタービル - 昭和レトロショッピング</li>
+                        <li>大阪城天守閣 - 歴史体験博物館</li>
+                        <li>JO-TERRACE OSAKA - 城を眺めるカフェ</li>
+                        <li>鶴橋コリアタウン - 韓国市場体験</li>
+                        <li>生野コリアタウン - K-POPグッズ＆コスメ</li>
+                        <li>布施駅周辺 - ものづくりの街</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>🍽️ グルメハイライト</h4>
+                    <ul>
+                        <li class="food-item">船場：関西グルメ街で食べ歩き</li>
+                        <li class="food-item">鶴橋：キンパ（麦の家）</li>
+                        <li class="food-item">鶴橋：崔おばさんのキムチ</li>
+                        <li class="food-item">生野：チーズハットク</li>
+                        <li class="food-item">生野：トゥンカロン（韓国マカロン）</li>
+                        <li class="food-item">布施：地元商店街グルメ</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>⏰ タイムスケジュール</h4>
+                    <ul>
+                        <li class="time-item">10:00 堺筋本町駅スタート</li>
+                        <li class="time-item">10:00-10:30 船場センタービル</li>
+                        <li class="time-item">11:15-12:00 大阪城公園</li>
+                        <li class="time-item">12:45-13:45 コリアタウン食べ歩き</li>
+                        <li class="time-item">13:00 近鉄布施駅到着</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>💡 旅のコツ</h4>
+                    <ul>
+                        <li class="tip-item">船場では地下通路を活用</li>
+                        <li class="tip-item">大阪城は入場券事前予約推奨</li>
+                        <li class="tip-item">コリアタウンは現金持参</li>
+                        <li class="tip-item">韓国グッズは最後に購入</li>
+                        <li class="tip-item">歩きやすい靴必須</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- パターン2 -->
+        <div class="route-content" id="route2">
+            <h2>⛩️ パターン2：寺社仏閣・下町文化ルート</h2>
+            
+            <div class="route-map">
+                <div class="spot start">
+                    <h3>堺筋本町駅</h3>
+                    <div class="time">スタート地点</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>船場センタービル</h3>
+                    <div class="time">30分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>四天王寺</h3>
+                    <div class="time">45分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>新世界・通天閣</h3>
+                    <div class="time">45分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>天王寺動物園</h3>
+                    <div class="time">30分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot end">
+                    <h3>近鉄布施駅</h3>
+                    <div class="time">ゴール</div>
+                </div>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-card">
+                    <h4>⛩️ 主要スポット</h4>
+                    <ul>
+                        <li>四天王寺 - 聖徳太子建立の古寺</li>
+                        <li>通天閣 - 大阪のシンボルタワー</li>
+                        <li>ビリケンさん - 幸運の神様</li>
+                        <li>ジャンジャン横丁 - 昭和レトロ商店街</li>
+                        <li>天王寺動物園 - 100年の歴史</li>
+                        <li>新世界 - コテコテ大阪文化</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>🍽️ グルメハイライト</h4>
+                    <ul>
+                        <li class="food-item">新世界：元祖串カツ</li>
+                        <li class="food-item">ジャンジャン横丁：どて焼き</li>
+                        <li class="food-item">通天閣周辺：たこ焼き</li>
+                        <li class="food-item">新世界：ホルモン焼き</li>
+                        <li class="food-item">天王寺：あべのハルカス展望台カフェ</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>⏰ タイムスケジュール</h4>
+                    <ul>
+                        <li class="time-item">10:00 堺筋本町駅スタート</li>
+                        <li class="time-item">10:00-10:30 船場センタービル</li>
+                        <li class="time-item">11:15-12:00 四天王寺参拝</li>
+                        <li class="time-item">12:30-13:15 新世界・通天閣</li>
+                        <li class="time-item">13:30-14:00 天王寺動物園</li>
+                        <li class="time-item">14:30 近鉄布施駅到着</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>💡 旅のコツ</h4>
+                    <ul>
+                        <li class="tip-item">四天王寺は早朝がおすすめ</li>
+                        <li class="tip-item">通天閣は入場時間予約必要</li>
+                        <li class="tip-item">串カツは「二度づけ禁止」</li>
+                        <li class="tip-item">新世界は昼間の散策推奨</li>
+                        <li class="tip-item">ビリケンさんの足裏を忘れずに</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- パターン3 -->
+        <div class="route-content" id="route3">
+            <h2>🌊 パターン3：水辺・文化・ビジネス街ルート</h2>
+            
+            <div class="route-map">
+                <div class="spot start">
+                    <h3>堺筋本町駅</h3>
+                    <div class="time">スタート地点</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>本町・淀屋橋</h3>
+                    <div class="time">30分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>中之島公園</h3>
+                    <div class="time">45分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>天満橋・大川沿い</h3>
+                    <div class="time">45分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot">
+                    <h3>京橋・OBP</h3>
+                    <div class="time">45分滞在</div>
+                </div>
+                <div class="arrow">→</div>
+                <div class="spot end">
+                    <h3>近鉄布施駅</h3>
+                    <div class="time">ゴール</div>
+                </div>
+            </div>
+            
+            <div class="details-grid">
+                <div class="detail-card">
+                    <h4>🏛️ 主要スポット</h4>
+                    <ul>
+                        <li>中之島公園 - 3,700株のバラ園</li>
+                        <li>中央公会堂 - 重要文化財の美建築</li>
+                        <li>大阪府立中之島図書館</li>
+                        <li>天満橋 - 浪華三大橋の一つ</li>
+                        <li>八軒屋浜船着場</li>
+                        <li>大阪ビジネスパーク</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>🍽️ グルメハイライト</h4>
+                    <ul>
+                        <li class="food-item">中之島：北浜レトロビル（アフタヌーンティー）</li>
+                        <li class="food-item">天満橋：川沿いカフェ</li>
+                        <li class="food-item">京橋：ビジネス街ランチ</li>
+                        <li class="food-item">OBP：展望レストラン</li>
+                        <li class="food-item">水上バス：船上軽食</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>⏰ タイムスケジュール</h4>
+                    <ul>
+                        <li class="time-item">10:00 堺筋本町駅スタート</li>
+                        <li class="time-item">10:30-11:15 中之島公園散策</li>
+                        <li class="time-item">11:45-12:30 天満橋・大川沿い</li>
+                        <li class="time-item">13:00-13:45 京橋・OBP</li>
+                        <li class="time-item">14:15 近鉄布施駅到着</li>
+                    </ul>
+                </div>
+                
+                <div class="detail-card">
+                    <h4>💡 旅のコツ</h4>
+                    <ul>
+                        <li class="tip-item">バラ園は春・秋がベスト</li>
+                        <li class="tip-item">水上バス時刻要確認</li>
+                        <li class="tip-item">夜景も美しいエリア</li>
+                        <li class="tip-item">レトロ建築の写真撮影</li>
+                        <li class="tip-item">川沿いは風対策を</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Google Maps Section -->
+        <div class="maps-section">
+            <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">🗺️ Googleマップでルート確認</h2>
+            
+            <div class="maps-grid">
+                <div class="map-card">
+                    <h3>🛍️ パターン1：商業・歴史・多文化</h3>
+                    <p>堺筋本町 → 船場センター → 大阪城 → コリアタウン → 布施</p>
+                    <a href="https://www.google.com/maps/dir/34.6822226,135.5064654/34.6815,135.5064/34.6873,135.5266/34.6619,135.5234/34.6519,135.5334/34.6641344,135.5633416/@34.6731,135.5349,12z/data=!3m1!4b1!4m2!4m1!3e2" target="_blank" class="map-btn">
+                        📱 Googleマップで開く
+                    </a>
+                    <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
+                        約12km・徒歩3時間
+                    </div>
+                </div>
+                
+                <div class="map-card">
+                    <h3>⛩️ パターン2：寺社仏閣・下町</h3>
+                    <p>堺筋本町 → 船場センター → 四天王寺 → 新世界 → 天王寺 → 布施</p>
+                    <a href="https://www.google.com/maps/dir/34.6822226,135.5064654/34.6815,135.5064/34.6536,135.5159/34.6524,135.5063/34.6537,135.5081/34.6641344,135.5633416/@34.6681,135.5349,12z/data=!3m1!4b1!4m2!4m1!3e2" target="_blank" class="map-btn">
+                        📱 Googleマップで開く
+                    </a>
+                    <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
+                        約11km・徒歩3時間
+                    </div>
+                </div>
+                
+                <div class="map-card">
+                    <h3>🌊 パターン3：水辺・文化・ビジネス街</h3>
+                    <p>堺筋本町 → 淀屋橋 → 中之島 → 天満橋 → 京橋 → 布施</p>
+                    <a href="https://www.google.com/maps/dir/34.6822226,135.5064654/34.6886,135.5020/34.6921,135.5065/34.6871,135.5134/34.6935,135.5276/34.6641344,135.5633416/@34.6881,135.5349,12z/data=!3m1!4b1!4m2!4m1!3e2" target="_blank" class="map-btn">
+                        📱 Googleマップで開く
+                    </a>
+                    <div style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
+                        約10km・徒歩3時間
+                    </div>
+                </div>
+            </div>
+            
+            <div class="map-instructions">
+                <h4>📋 マップの使い方</h4>
+                <ul>
+                    <li>🔗 リンクをクリックすると、Googleマップアプリまたはブラウザでルートが表示されます</li>
+                    <li>🚶‍♂️ 徒歩ルートが自動設定されています</li>
+                    <li>📍 各スポットをタップすると詳細情報が表示されます</li>
+                    <li>🧭 現在地から最寄りのスポットまでのナビゲーションも可能</li>
+                    <li>📱 スマホにブックマーク保存しておくと便利です</li>
+                </ul>
+                
+                <div style="margin-top: 25px;">
+                    <h4>🏢 個別スポットのマップリンク</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 15px;">
+                        <a href="https://www.google.com/maps/place/船場センタービル/@34.6815,135.5064,17z" target="_blank" style="background: #3498db; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; text-align: center; font-size: 0.9rem;">🏢 船場センタービル</a>
+                        <a href="https://www.google.com/maps/place/大阪城/@34.6873,135.5266,17z" target="_blank" style="background: #e74c3c; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; text-align: center; font-size: 0.9rem;">🏰 大阪城</a>
+                        <a href="https://www.google.com/maps/place/鶴橋コリアタウン/@34.6619,135.5234,17z" target="_blank" style="background: #27ae60; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; text-align: center; font-size: 0.9rem;">🇰🇷 鶴橋コリアタウン</a>
+                        <a href="https://www.google.com/maps/place/四天王寺/@34.6536,135.5159,17z" target="_blank" style="background: #f39c12; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; text-align: center; font-size: 0.9rem;">⛩️ 四天王寺</a>
+                        <a href="https://www.google.com/maps/place/通天閣/@34.6524,135.5063,17z" target="_blank" style="background: #9b59b6; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; text-align: center; font-size: 0.9rem;">🗼 通天閣</a>
+                        <a href="https://www.google.com/maps/place/中之島公園/@34.6921,135.5065,17z" target="_blank" style="background: #1abc9c; color: white; padding: 8px 15px; border-radius: 20px; text-decoration: none; text-align: center; font-size: 0.9rem;">🌹 中之島公園</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 20px; border-radius: 15px; margin-top: 25px; text-align: center; color: white;">
+                <h4 style="margin-bottom: 15px;">📱 スマホでより便利に！</h4>
+                <p style="margin-bottom: 15px; opacity: 0.9;">このページのURLをスマホにブックマーク保存しておくと、現地でルートを確認するときに便利です。</p>
+                <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; backdrop-filter: blur(10px);">
+                    <p style="font-size: 0.9rem; margin: 0;">💡 ヒント：各マップリンクは新しいタブで開くので、複数のルートを比較することも可能です</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary">
+            <h3>📊 全ルート共通情報</h3>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">3</span>
+                    時間
+                </div>
+                <div class="stat">
+                    <span class="stat-number">10-12</span>
+                    km
+                </div>
+                <div class="stat">
+                    <span class="stat-number">6</span>
+                    スポット
+                </div>
+                <div class="stat">
+                    <span class="stat-number">∞</span>
+                    思い出
+                </div>
+            </div>
+        </div>
+        
+        <button class="print-btn" onclick="window.print()">📄 しおりを印刷</button>
+    </div>
+
+    <script>
+        function showRoute(routeNumber) {
+            // Hide all route contents
+            document.querySelectorAll('.route-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.route-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected route content
+            document.getElementById('route' + routeNumber).classList.add('active');
+            
+            // Add active class to selected tab
+            document.querySelectorAll('.route-tab')[routeNumber - 1].classList.add('active');
+        }
+        
+        // Add some interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add hover effects for spots
+            document.querySelectorAll('.spot').forEach(spot => {
+                spot.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05) rotate(1deg)';
+                });
+                
+                spot.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
